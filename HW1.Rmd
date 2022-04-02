@@ -1,0 +1,28 @@
+---
+title: "HW1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+y1<-c(3129, 3000, 2865, 2890)
+y2<-c(3200, 3300, 2975, 3150)
+y3<-c(2800, 2900, 2985, 2765)
+y4<-c(2600, 2700, 2600, 2765)
+y <- c(y1, y2, y3, y4)
+n <- rep(4, 4) 
+group <- rep(1:4, n)
+group_df <- data.frame(y, group)
+group_df <- transform(group_df, group = factor(group))
+```
+
+
+
+### Problem 1. (a)
+```{r}
+summary(aov(y ~ group, data = group_df))
+```
