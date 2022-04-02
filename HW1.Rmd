@@ -63,3 +63,35 @@ groupZ <- rep(1:3, nZ)
 groupZ_df <- data.frame(Z, groupZ)
 groupZ_df <- transform(groupZ_df, groupZ = factor(groupZ))
 ```
+
+### Problem 3. (a) 
+```{r}
+summary(aov(Z ~ groupZ, data = groupZ_df))
+```
+### Problem 3. (b) 
+```{r}
+par(mfrow=c(1,2))
+plot(lm(Z ~ groupZ, data = groupZ_df), which=1:2)#정규성 만족
+bartlett.test(Z ~ groupZ, groupZ_df)#등분산성 만족
+```
+
+### Problem 3. (c) 
+```{r}
+summary(Z2)
+n<-5
+xbar<-mean(Z2)
+s<-var(Z2)
+margin <- qt(0.975,df=n-1)*s/sqrt(n)
+xbar-margin
+xbar+margin
+
+TukeyHSD(aov(Z ~ groupZ, data = groupZ_df), conf.level = 0.99)
+t.test(Z2, Z3, var.equal = TRUE, conf.level = 0.99)
+```
+
+### Problem 4. 
+```{r}
+library(car)
+leveneTest(aov(Z ~ groupZ, data = groupZ_df), center=median)#등분산성 만족
+```
+
