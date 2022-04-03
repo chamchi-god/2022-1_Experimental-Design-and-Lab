@@ -1,9 +1,13 @@
 ---
 title: "HW1"
-output: html_document
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
+Sys.setlocale('LC_ALL','C')
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -25,6 +29,7 @@ group_df <- transform(group_df, group = factor(group))
 ```{r}
 summary(aov(y ~ group, data = group_df))#MSE= 12380
 ```
+<pl> p-value가 0.000367이므로 유의수준 0.05에서 Mixing Techniques이 시멘트의 강도에 영향을 미치지 않는다는 귀무가설을 기각할 수 있다.<pl/>
 
 ### Problem 1. (b)
 ```{r}
@@ -37,21 +42,28 @@ abs(mean(y2)-mean(y4))#490
 abs(mean(y3)-mean(y4))#196.25
 ```
 
+<pl> 유의수준 0.05에서 LSD값은 171.4이고, 108.5가 나오는 Mixing Techniques 1과 3을 제외하고는 나머지 Mixing Techniques사이에서는 통계량이 LSD값보다 크므로 Mixing Techniques 1과 3 사이에서만 두 Mixing Techniques간 평균이 같다는 귀무가설을 기각할 수 있다.<pl/>
+
 ### Problem 1. (c)
 ```{r}
-plot(lm(y ~ group),2)
+plot(aov(y ~ group, group_df),2)
 ```
+
+<pl> Q-Q plot을 그렸을 때 점들이 직선 주위에 위치하므로 정규성을 가진다고 말할 수 있다.<pl/>
 
 ### Problem 1. (d)
 ```{r}
-plot(lm(y ~ group),1)
+plot(aov(y ~ group, group_df),1)
 ```
+
+<pl> 잔차도를 그렸을 때 Fitted values와 Residuals간 관계가 존재하지 않음을 확인할 수 있다. 또한 빨간색 실선도 0에 수평선 가깝게 나타나므로 등분산성을 가진다고 말할 수 있다.<pl/>
 
 ### Problem 2. 
 ```{r}
 TukeyHSD(x=aov(y ~ group, data = group_df), conf.level=0.95)
 ```
 
+<pl> Fisher LSD method와 다르게  Tukey’s test에서는 Mixing Techniques 1과 3뿐만 아니라 Mixing Techniques 3과 4에서도 p- value가 0.05보다 작아 두 Mixing Technique간 평균이 같다는 귀무가설을 기각할 수 있다.<pl/>
 
 ```{r}
 Z1<-c(100, 96, 92, 96, 92)
@@ -68,12 +80,16 @@ groupZ_df <- transform(groupZ_df, groupZ = factor(groupZ))
 ```{r}
 summary(aov(Z ~ groupZ, data = groupZ_df))
 ```
+
+<pl>  p- value가 6.14e-06이므로 0.05보다 작아 배터리 브랜드들 간 평균의 차이가 없다는 귀무가설을 기각할 수 있다. <pl/>
+
 ### Problem 3. (b) 
 ```{r}
 par(mfrow=c(1,2))
-plot(lm(Z ~ groupZ, data = groupZ_df), which=1:2)#정규성 만족
-bartlett.test(Z ~ groupZ, groupZ_df)#등분산성 만족
+plot(lm(Z ~ groupZ, data = groupZ_df), which=1:2)
 ```
+
+<pl> Q-Q plot을 그렸을 때 점들이 직선 주위에 위치하므로 정규성을 가진다고 말할 수 있다. 마찬가지로 잔차도를 그렸을 때 빨간색 실선이 0에 수평선 가깝게 나타나므로 등분산성을 가진다고 말할 수 있다. <pl/>
 
 ### Problem 3. (c) 
 ```{r}
@@ -81,13 +97,14 @@ summary(Z2)
 n<-5
 xbar<-mean(Z2)
 s<-var(Z2)
-margin <- qt(0.975,df=n-1)*s/sqrt(n)
+margin <- qt(0.975,df=n-1)*sqrt(s/n)
 xbar-margin
 xbar+margin
 
 TukeyHSD(aov(Z ~ groupZ, data = groupZ_df), conf.level = 0.99)
-t.test(Z2, Z3, var.equal = TRUE, conf.level = 0.99)
 ```
+
+<pl>  mean life of battery brand 2의 95% 신뢰구간은 one sample t test을 이용해 구해보면, [74.62322, 84.17678]이고, mean different between the lives of battery brands 2 and 3는 problem 3. (a)에서 세 브랜드 간의 평균이 같다는 귀무가설을 기각했으므로, Multiple Comparisons approaches 중 하나인 Tukey method를 이용해 구해보면 [12.087103, 29.912897]을 신뢰구간으로 얻을 수 있다. <pl/>
 
 ### Problem 4. 
 ```{r}
@@ -95,3 +112,4 @@ library(car)
 leveneTest(aov(Z ~ groupZ, data = groupZ_df), center=median)#등분산성 만족
 ```
 
+<pl>  p-value가 0.9328>0.05이므로 유의수준 0.05에서 잔차도를 이용한 Problem 3과 동일하게 등분산성이 성립한다는 귀무가설을 기각할 수 없다. <pl/>
