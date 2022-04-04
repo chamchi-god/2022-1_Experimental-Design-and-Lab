@@ -42,7 +42,7 @@ abs(mean(y2)-mean(y4))#490
 abs(mean(y3)-mean(y4))#196.25
 ```
 
-<pl> 유의수준 0.05에서 LSD값은 171.4이고, 108.5가 나오는 Mixing Techniques 1과 3을 제외하고는 나머지 Mixing Techniques사이에서는 통계량이 LSD값보다 크므로 Mixing Techniques 1과 3 사이에서만 두 Mixing Techniques간 평균이 같다는 귀무가설을 기각할 수 있다.<pl/>
+<pl> 유의수준 0.05에서 LSD값은 171.4이고, 108.5가 나오는 Mixing Techniques 1과 3을 제외하고는 나머지 Mixing Techniques사이에서는 통계량이 LSD값보다 크므로 Mixing Techniques 1과 3 사이에서만 두 Mixing Techniques간 평균이 같다는 귀무가설을 기각할 수 없다.<pl/>
 
 ### Problem 1. (c)
 ```{r}
@@ -63,7 +63,7 @@ plot(aov(y ~ group, group_df),1)
 TukeyHSD(x=aov(y ~ group, data = group_df), conf.level=0.95)
 ```
 
-<pl> Fisher LSD method와 다르게  Tukey’s test에서는 Mixing Techniques 1과 3뿐만 아니라 Mixing Techniques 3과 4에서도 p- value가 0.05보다 작아 두 Mixing Technique간 평균이 같다는 귀무가설을 기각할 수 있다.<pl/>
+<pl> Fisher LSD method와 다르게  Tukey’s test에서는 Mixing Techniques 1과 3뿐만 아니라 Mixing Techniques 1과 2, 3과 4에서도 p- value가 0.05보다 커 두 Mixing Technique간 평균이 같다는 귀무가설을 기각할 수 없다.<pl/>
 
 ```{r}
 Z1<-c(100, 96, 92, 96, 92)
