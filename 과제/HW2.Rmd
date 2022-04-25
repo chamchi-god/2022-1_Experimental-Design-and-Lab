@@ -1,0 +1,184 @@
+---
+title: "HW2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problem 1.
+
+```{r}
+y1<-c(73, 68, 74, 71, 67)
+y2<-c(73, 67, 75, 72, 70)
+y3<-c(75, 68, 78, 73, 68)
+y4<-c(73, 71, 75, 75, 69)
+y <- rbind(y1,y2,y3,y4)
+chem_trt <- rep(1:4, rep(5, 4) )
+bolt_block<-rep(1:5 ,4)
+group_df <- data.frame(y, chem_trt,bolt_block)
+group_df <- transform(group_df, chem_trt = factor(chem_trt),bolt_block = factor(bolt_block) )
+```
+
+```{r}
+a=0
+for (i in 1:4) {
+    a<-a+((mean(y[i,])-mean(y))^2)
+  }
+sstrt<-5*a#5는 block의 수
+
+b=0
+for (j in 1:5) {
+    b<-b+((mean(y[,j])-mean(y))^2)
+  }
+ssb<-4*b#4는 trt의 수
+  
+k=0
+for (i in 1:4) {
+  for (j in 1:5) {
+    k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])+mean(y))^2)
+  }
+}
+sse<-k
+
+mstrt<-sstrt/3
+msb<-ssb/4
+mse<-sse/12
+
+mstrt/mse
+msb/mse
+
+qf(0.975, 3, 12)#4.474185<mstrt/mse
+qf(0.975, 4, 12)#4.4121209>msb/mse
+
+pf(mstrt/mse, 3, 12, lower.tail = FALSE)
+pf(msb/mse, 3, 12, lower.tail = FALSE)
+
+
+```
+
+```{r}
+summary(aov(y ~chem_trt+ bolt_block, data = group_df))
+```
+
+### Problem 2.
+
+```{r}
+y1<-c(73, 68, 74, 71)
+y2<-c(73, 67, 75, 72)
+y3<-c(75, 68, 78, 73)
+y <- c(y1, y2, y3)
+trt <- rep(1:3, rep(4, 3))
+block<-rep(c("NE", "NW", "SE", "SW"),3)
+group_df <- data.frame(y, trt,block)
+group_df <- transform(group_df, trt = factor(trt), block = factor(block))
+```
+
+```{r}
+summary(aov(y ~ trt+block, data = group_df))#MSE= 12.08
+
+(lsd<-qt(p=.975, df=6)*sqrt(0.75*2/4))#1.4984
+abs(mean(y1)-mean(y2))#0.25
+abs(mean(y1)-mean(y3))#2
+abs(mean(y2)-mean(y3))#1.75
+
+plot(aov(y ~ trt+block, group_df),2)
+plot(aov(y ~ trt+block, group_df),1)
+plot(aov(y ~ trt, group_df),1)
+plot(aov(y ~ block, group_df),1)
+```
+
+```{r}
+y1<-c(8, 7, 1, 7, 3)
+y2<-c(11, 2, 7, 3, 8)
+y3<-c(4, 9, 10, 1, 5)
+y4<-c(6, 8, 6, 6, 10)
+y5<-c(4, 2, 3, 8, 8)
+y <- c(y1, y2, y3, y4, y5)
+batch_block <- rep(1:5, rep(5, 5))
+day_block<-rep(1:5,5)
+trt<-c("A", "B", "D", "C", "E","C", "E", "A", "D", "B","B", "A", "C", "E", "D","D", "C", "E", "B", "A","E", "D", "B", "A", "C")
+group_df <- data.frame(y, trt, batch_block, day_block)
+group_df <- transform(group_df, trt = factor(trt), batch_block= factor(batch_block), day_block = factor(day_block) )
+```
+
+```{r}
+summary(aov(y ~ trt+batch_block+day_block, data = group_df))
+```
+
+
+```{r}
+y1<-c(8, 7, 1, 7, 3)
+y2<-c(11, 2, 7, 3, 8)
+y3<-c(4, 9, 10, 1, 5)
+y4<-c(6, 8, 6, 6, 10)
+y5<-c(4, 2, 3, 8, 8)
+y <- rbind(y1,y2,y3,y4,y5)
+
+z1<-c("A", "B", "D", "C", "E")
+z2<-c("C", "E", "A", "D", "B")
+z3<-c("B", "A", "C", "E", "D")
+z4<-c("D", "C", "E", "B", "A")
+z5<-c("E", "D", "B", "A", "C")
+z <- rbind(z1,z2,z3,z4,z5)
+
+a=0
+for (i in 1:5) {
+    a<-a+((mean(y[i,])-mean(y))^2)
+  }
+ssb<-5*a#5는 block의 수
+
+b=0
+for (j in 1:5) {
+    b<-b+((mean(y[,j])-mean(y))^2)
+  }
+ssd<-5*b#5는 trt의 수
+
+A<-c(8, 7, 9, 10, 8)
+B<-c(7, 8, 4, 6, 3)
+C<-c(7, 11, 10, 8, 8)
+D<-c(1, 3, 5, 6, 2)
+E<-c(3, 2, 1, 6, 4)
+G <- rbind(A,B,C,D,E)
+c=0
+for (k in 1:5) {
+    c<-c+((mean(G[k,])-mean(G))^2)
+  }
+sstrt<-5*c
+
+  
+k=0
+for (i in 1:5) {
+  for (j in 1:5) {
+    if(z[i,j]== "A"){
+      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[1,])+2*mean(y))^2)
+    } else if(z[i,j]== "B"){
+      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[2,])+2*mean(y))^2)
+    } else if(z[i,j]== "C"){
+      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[3,])+2*mean(y))^2)
+    } else if(z[i,j]=="D"){
+      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[4,])+2*mean(y))^2)
+    } else{
+      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[5,])+2*mean(y))^2) 
+    }
+  
+  }
+}
+sse<-k
+
+mstrt<-sstrt/4
+msb<-ssb/4
+msd<-ssd/4
+mse<-sse/12
+
+mstrt/mse
+msd/mse
+msb/mse
+
+qf(0.975, 4, 12)#4.474185<mstrt/mse
+
+pf(mstrt/mse, 4, 12, lower.tail = FALSE)
+pf(msb/mse, 4, 12, lower.tail = FALSE)
+pf(msd/mse, 4, 12, lower.tail = FALSE)
+```
