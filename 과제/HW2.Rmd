@@ -1,6 +1,9 @@
 ---
 title: "HW2"
-output: html_document
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -15,24 +18,18 @@ y2<-c(73, 67, 75, 72, 70)
 y3<-c(75, 68, 78, 73, 68)
 y4<-c(73, 71, 75, 75, 69)
 y <- rbind(y1,y2,y3,y4)
-chem_trt <- rep(1:4, rep(5, 4) )
-bolt_block<-rep(1:5 ,4)
-group_df <- data.frame(y, chem_trt,bolt_block)
-group_df <- transform(group_df, chem_trt = factor(chem_trt),bolt_block = factor(bolt_block) )
-```
 
-```{r}
 a=0
 for (i in 1:4) {
     a<-a+((mean(y[i,])-mean(y))^2)
   }
-sstrt<-5*a#5는 block의 수
+(SS_trt<-5*a) #5는 block의 수
 
 b=0
 for (j in 1:5) {
     b<-b+((mean(y[,j])-mean(y))^2)
   }
-ssb<-4*b#4는 trt의 수
+(SS_block<-4*b) #4는 trt의 수
   
 k=0
 for (i in 1:4) {
@@ -40,54 +37,67 @@ for (i in 1:4) {
     k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])+mean(y))^2)
   }
 }
-sse<-k
+(SSe<-k)
 
-mstrt<-sstrt/3
-msb<-ssb/4
-mse<-sse/12
+(MS_trt<-SS_trt/3) #자유도는 trt의 수 -1 = 3
+(MS_block<-SS_block/4) #자유도는 block의 수 -1 = 4
+(MSe<-SSe/12) #자유도는 (trt의 수 -1) * (block의 수 -1) = 12
 
-mstrt/mse
-msb/mse
+(MS_trt/MSe) # MS_trt/MSe는 H0하에서 F(3,12)를 따른다.
+(MS_block/MSe) # MS_block/MSe는 H0하에서 F(4,12)를 따른다.
 
-qf(0.975, 3, 12)#4.474185<mstrt/mse
-qf(0.975, 4, 12)#4.4121209>msb/mse
+qf(0.975, 3, 12)#4.474185 > MS_trt/MSe , 따라서 Chemical factor가 tensile strengths에 영향을 미치지 않는다는 귀무가설은 기각할 수 없다.
+qf(0.975, 4, 12)#4.4121209 < MS_block/MSe ,  따라서 Bolts의 종류가 tensile strengths에 영향을 미치지 않는다는 귀무가설을 기각한다.
 
-pf(mstrt/mse, 3, 12, lower.tail = FALSE)
-pf(msb/mse, 3, 12, lower.tail = FALSE)
-
-
+pf(MS_trt/MSe, 3, 12, lower.tail = FALSE) #p-value를 통해 확인해보아도, 0.05보다 크므로 귀무가설을 기각할 수 없다.
+pf(MS_block/MSe, 4, 12, lower.tail = FALSE) #p-value를 통해 확인해보아도, 0.05보다 작으므로 귀무가설을 기각한다.
 ```
 
-```{r}
-summary(aov(y ~chem_trt+ bolt_block, data = group_df))
-```
+p-value값이 Chemical factor에서는 0.05보다 커 Chemical factor가 tensile strengths에 영향을 미치지 않는다는 귀무가설은 기각할 수 없다. 그러나 Bolts factor에서는 p-value값이 0.05보다 작아 Bolts의 종류가 tensile strengths에 영향을 미치지 않는다는 귀무가설은 기각된다.
+
+Problem 1의 ANOVA TABLE은 위 코드를 통해 구한 값을 바탕으로 제출한 과제의 맨 뒤에서 2번째 쪽에 기술하였다.
 
 ### Problem 2.
 
 ```{r}
-y1<-c(73, 68, 74, 71)
-y2<-c(73, 67, 75, 72)
-y3<-c(75, 68, 78, 73)
+y1<-c(73, 68, 74, 71, 67)
+y2<-c(73, 67, 75, 72, 70)
+y3<-c(75, 68, 78, 73, 68)
 y <- c(y1, y2, y3)
-trt <- rep(1:3, rep(4, 3))
-block<-rep(c("NE", "NW", "SE", "SW"),3)
+trt <- rep(1:3, rep(5, 3))
+block<-rep(c("NE", "NW", "SE", "SW", "5"),3)
 group_df <- data.frame(y, trt,block)
 group_df <- transform(group_df, trt = factor(trt), block = factor(block))
 ```
 
+### Problem 2. (a)
 ```{r}
-summary(aov(y ~ trt+block, data = group_df))#MSE= 12.08
+summary(aov(y ~ trt+block, data = group_df))#MSE= 1.32
+```
 
-(lsd<-qt(p=.975, df=6)*sqrt(0.75*2/4))#1.4984
-abs(mean(y1)-mean(y2))#0.25
-abs(mean(y1)-mean(y3))#2
-abs(mean(y2)-mean(y3))#1.75
+R에 내장된 aov함수를 이용해 ANOVA를 진행한 결과 p-value값이 trt에서는 0.05보다 커 Design이 메일 응답의 수에 영향을 미치지 않는다는 귀무가설은 기각할 수 없다. 그러나 block에서는 p-value값이 0.05보다 작아 Region이 메일 응답의 수에 영향을 미치지 않는다는 귀무가설은 기각된다.
 
+### Problem 2. (b)
+```{r}
+(lsd<-qt(p=.975, df=8)*sqrt(1.32*2/5))#1.675626
+abs(mean(y1)-mean(y2))#0.8
+abs(mean(y1)-mean(y3))#1.8
+abs(mean(y2)-mean(y3))#1
+```
+우선 sse의 자유도가 8, MSE 값이 1.32을 바탕으로 LSD=1.675626을 구했고, 이를 바탕으로 각 treatment의 평균 간 차이를 LSD값과 비교한 결과 Design 1과 Design 2의 평균간 차이만이 1.8로, LSD값보다 커 Design 1과 Design 2의 평균이 같다는 귀무가설을 기각할 수 있다. 나머지 Design 1과 Design 3, Design 2과 Design 3에서는 평균이 같다는 귀무가설을 기각할 수 없다.
+
+### Problem 2. (c)
+```{r}
 plot(aov(y ~ trt+block, group_df),2)
-plot(aov(y ~ trt+block, group_df),1)
 plot(aov(y ~ trt, group_df),1)
 plot(aov(y ~ block, group_df),1)
+plot(aov(y ~ trt+block, group_df),1)
 ```
+
+먼저, QQ-plot을 그려본 결과 정규성을 잘 만족하는 것으로 보인다. 다음으로, residuals vs. treatment, residuals vs blocks,
+and residuals vs. fitted values에 관한 잔차도를 그려보았고, 마찬가지로 0 주위에서 잔차들이 아무런 패턴없이 나타나는 것으로 보아 등분산성도 만족하는 것으로 보인다.
+
+### Problem 3.
 
 ```{r}
 y1<-c(8, 7, 1, 7, 3)
@@ -101,12 +111,9 @@ day_block<-rep(1:5,5)
 trt<-c("A", "B", "D", "C", "E","C", "E", "A", "D", "B","B", "A", "C", "E", "D","D", "C", "E", "B", "A","E", "D", "B", "A", "C")
 group_df <- data.frame(y, trt, batch_block, day_block)
 group_df <- transform(group_df, trt = factor(trt), batch_block= factor(batch_block), day_block = factor(day_block) )
-```
 
-```{r}
 summary(aov(y ~ trt+batch_block+day_block, data = group_df))
 ```
-
 
 ```{r}
 y1<-c(8, 7, 1, 7, 3)
@@ -114,71 +121,77 @@ y2<-c(11, 2, 7, 3, 8)
 y3<-c(4, 9, 10, 1, 5)
 y4<-c(6, 8, 6, 6, 10)
 y5<-c(4, 2, 3, 8, 8)
-y <- rbind(y1,y2,y3,y4,y5)
+y <- rbind(y1,y2,y3,y4,y5) #the reaction time of a chemical process값 저장
 
 z1<-c("A", "B", "D", "C", "E")
 z2<-c("C", "E", "A", "D", "B")
 z3<-c("B", "A", "C", "E", "D")
 z4<-c("D", "C", "E", "B", "A")
 z5<-c("E", "D", "B", "A", "C")
-z <- rbind(z1,z2,z3,z4,z5)
+z <- rbind(z1,z2,z3,z4,z5) #ingredients값 저장
+
+p<-5
 
 a=0
-for (i in 1:5) {
+for (i in 1:p) {
     a<-a+((mean(y[i,])-mean(y))^2)
   }
-ssb<-5*a#5는 block의 수
+(SS_batch<-p*a) #SS_batch
 
 b=0
-for (j in 1:5) {
+for (j in 1:p) {
     b<-b+((mean(y[,j])-mean(y))^2)
   }
-ssd<-5*b#5는 trt의 수
+(SS_day<-p*b) #SS_day
 
-A<-c(8, 7, 9, 10, 8)
-B<-c(7, 8, 4, 6, 3)
-C<-c(7, 11, 10, 8, 8)
-D<-c(1, 3, 5, 6, 2)
-E<-c(3, 2, 1, 6, 4)
+A<-c(8, 7, 9, 10, 8) #모든 the reaction time of a chemical process값 중 A ingredients로 실험 한 것.
+B<-c(7, 8, 4, 6, 3) #모든 the reaction time of a chemical process값 중  B ingredients로 실험 한 것.
+C<-c(7, 11, 10, 8, 8) #모든 the reaction time of a chemical process값 중 C ingredients로 실험 한 것.
+D<-c(1, 3, 5, 6, 2) #모든 the reaction time of a chemical process값 중 D ingredients로 실험 한 것.
+E<-c(3, 2, 1, 6, 4) #모든 the reaction time of a chemical process값 중 E ingredients로 실험 한 것.
 G <- rbind(A,B,C,D,E)
+
 c=0
-for (k in 1:5) {
+for (k in 1:p) {
     c<-c+((mean(G[k,])-mean(G))^2)
   }
-sstrt<-5*c
+(SS_trt<-p*c) #SS_trt
 
-  
-k=0
-for (i in 1:5) {
-  for (j in 1:5) {
+s=0
+for (i in 1:p) {
+  for (j in 1:p) {
     if(z[i,j]== "A"){
-      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[1,])+2*mean(y))^2)
+      s<-s+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[1,])+2*mean(y))^2)
     } else if(z[i,j]== "B"){
-      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[2,])+2*mean(y))^2)
+      s<-s+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[2,])+2*mean(y))^2)
     } else if(z[i,j]== "C"){
-      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[3,])+2*mean(y))^2)
+      s<-s+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[3,])+2*mean(y))^2)
     } else if(z[i,j]=="D"){
-      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[4,])+2*mean(y))^2)
+      s<-s+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[4,])+2*mean(y))^2)
     } else{
-      k<-k+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[5,])+2*mean(y))^2) 
+      s<-s+((y[i,j]-mean(y[i,])-mean(y[,j])-mean(G[5,])+2*mean(y))^2) 
     }
   
   }
 }
-sse<-k
+(SSe<-s) #SSE
 
-mstrt<-sstrt/4
-msb<-ssb/4
-msd<-ssd/4
-mse<-sse/12
+(MS_trt<-SS_trt/(p-1))
+(MS_batch<-SS_batch/(p-1))
+(MS_day<-SS_day/(p-1))
+(MSe<-(SSe/((p-2)*(p-1))))
 
-mstrt/mse
-msd/mse
-msb/mse
+(MS_trt/MSe) # MS_trt/MSe는 H0하에서 F(4,12)를 따른다.
+(MS_batch/MSe) # MS_batch/MSe는 H0하에서 F(4,12)를 따른다.
+(MS_day/MSe) # MS_day/MSe는 H0하에서 F(4,12)를 따른다.
 
-qf(0.975, 4, 12)#4.474185<mstrt/mse
+qf(0.975, (p-1), ((p-2)*(p-1)))# (MS_day/MSe), (MS_batch/MSe) < 4.474185< (MS_trt/MSe) 
 
-pf(mstrt/mse, 4, 12, lower.tail = FALSE)
-pf(msb/mse, 4, 12, lower.tail = FALSE)
-pf(msd/mse, 4, 12, lower.tail = FALSE)
+pf(MS_trt/MSe, (p-1), ((p-2)*(p-1)), lower.tail = FALSE) #0.0004876512 < 0.05
+pf(MS_batch/MSe , (p-1), ((p-2)*(p-1)), lower.tail = FALSE) #0.3476182 > 0.05
+pf(MS_day/MSe, (p-1), ((p-2)*(p-1)), lower.tail = FALSE) #0.4550143 > 0.05
 ```
+
+p-value값이 Ingredients factor에서는 0.05보다 작아 Ingredients가  the reaction time of a chemical process에 영향을 미치지 않는다는 귀무가설은 기각된다. 그러나 batch와 day factor에서는 p-value값이 0.05보다 커 batch의 종류와 실험 날짜가 the reaction time of a chemical process에 영향을 미치지 않는다는 귀무가설은 기각할 수 없다.
+
+Problem 3의 ANOVA TABLE은 위 코드를 통해 구한 값을 바탕으로 제출한 과제의 맨 뒤에서 2번째 쪽에 기술하였다.
