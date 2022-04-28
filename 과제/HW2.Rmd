@@ -65,7 +65,7 @@ y2<-c(73, 67, 75, 72, 70)
 y3<-c(75, 68, 78, 73, 68)
 y <- c(y1, y2, y3)
 trt <- rep(1:3, rep(5, 3))
-block<-rep(c("NE", "NW", "SE", "SW", "5"),3)
+block<-rep(1:5,3)
 group_df <- data.frame(y, trt,block)
 group_df <- transform(group_df, trt = factor(trt), block = factor(block))
 ```
@@ -88,10 +88,11 @@ abs(mean(y2)-mean(y3))#1
 
 ### Problem 2. (c)
 ```{r}
-plot(aov(y ~ trt+block, group_df),2)
-plot(aov(y ~ trt, group_df),1)
-plot(aov(y ~ block, group_df),1)
-plot(aov(y ~ trt+block, group_df),1)
+anova<-aov(y ~ trt+block, group_df)
+plot(anova, 2)
+plot(anova, 1)
+plot(anova$residuals~trt)
+plot(anova$residuals~block)
 ```
 
 먼저, QQ-plot을 그려본 결과 정규성을 잘 만족하는 것으로 보인다. 다음으로, residuals vs. treatment, residuals vs blocks,
